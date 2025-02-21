@@ -1,5 +1,7 @@
 const { Sequelize, DataTypes } = require('sequelize');
-const sequelize = new Sequelize(process.env.DATABASE_URL || 'mysql://localhost:3306/kart_race_db?user=root&password=');
+const sequelize = new Sequelize(process.env.DATABASE_URL || 'postgres://localhost:5432/kart_race_db', {
+  dialect: 'postgres',
+});
 
 const Track = require('./track')(sequelize, DataTypes);
 const Schedule = require('./schedule')(sequelize, DataTypes);
