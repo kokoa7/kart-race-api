@@ -24,4 +24,32 @@ router.get('/', async (req, res) => {
   }
 });
 
+// POST /schedules - 新しいスケジュールを作成
+router.post('/', async (req, res) => {
+  try {
+    const { date, trackId, raceName } = req.body;
+
+    // 日付の処理
+    const startDate = new Date(`${date}T10:00:00`); // 10:00開始
+    const endDate = new Date(`${date}T12:00:00`);   // 12:00終了
+
+    // データの検証
+    if (!date || !trackId || !raceName) {
+      return res.status(400).json({ error: '必須項目が不足しています' });
+    }
+
+    const schedule = await Schedule.create({
+      title: raceName,
+      start_date: startDate,
+      end_date: endDate,
+      TrackId: parseInt(trackId, 10)
+    });
+
+    res.status(201).json(schedule);
+  } catch (error) {
+    console.error('Error creating schedule:', error);
+    res.status(500).json({ error: 'スケジュールの作成に失敗しました' });
+  }
+});
+
 module.exports = router;
