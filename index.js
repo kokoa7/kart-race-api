@@ -2,11 +2,13 @@ const express = require('express');
 const cors = require('cors');
 const sequelize = require('./models');
 const schedulesRouter = require('./routes/schedules');
+const tracksRouter = require('./routes/tracks');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 app.use('/schedules', schedulesRouter);
+app.use('/tracks', tracksRouter);
 
 app.get('/', (req, res) => res.send('Kart Race API'));
 
