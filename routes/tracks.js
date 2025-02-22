@@ -7,12 +7,44 @@ const Track = sequelize.models.Track;
 router.get('/', async (req, res) => {
   try {
     const tracks = await Track.findAll({
-      attributes: ['id', 'name', 'createdAt', 'updatedAt']
+      attributes: ['id', 'fullName', 'shortName', 'prefecture']
     });
     res.json(tracks);
   } catch (error) {
     console.error('Error fetching tracks:', error);
     res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// POST /tracks - 新しいトラックを作成
+router.post('/', async (req, res) => {
+  try {
+    const { fullName, shortName, prefecture } = req.body;
+    
+    // バリデーション
+    if (!fullName || !shortName || !prefecture) {
+      return res.status(400).json({ 
+        error: '必須項目が不足しています',
+        required: ['fullName', 'shortName', 'prefecture']
+      });
+    }
+
+    const track = await Track.create({
+      fullName,
+      shortName,
+      prefecture
+    });
+
+    res.status(201).json({
+      trackId: track.id,
+      fullName: track.fullName,
+      shortName: track.shortName,
+      prefecture: track.prefecture
+    });
+
+  } catch (error) {
+    console.error('Error creating track:', error);
+    res.status(500).json({ error: 'トラックの作成に失敗しました' });
   }
 });
 

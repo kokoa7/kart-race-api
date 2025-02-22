@@ -5,10 +5,18 @@ module.exports = (sequelize, DataTypes) => {
       primaryKey: true,
       autoIncrement: true,
     },
-    name: {
+    fullName: {
       type: DataTypes.STRING,
       allowNull: false,
     },
+    shortName: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    prefecture: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    }
   }, {
     tableName: 'Tracks', // テーブル名を明示
   });
