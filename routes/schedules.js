@@ -4,23 +4,21 @@ const sequelize = require('../models');
 const Track = sequelize.models.Track;
 const Schedule = sequelize.models.Schedule;
 
+// GET /schedules - すべてのスケジュールを取得
 router.get('/', async (req, res) => {
   try {
     const schedules = await Schedule.findAll({
-      include: [{ model: Track, attributes: ['name'] }], // Trackからnameのみ取得
-      attributes: ['title', 'start_date', 'end_date'], // 生のフィールド名を指定
+      attributes: ['id', 'title', 'start_date', 'end_date'],
+      include: [{
+        model: Track,
+        attributes: ['id', 'fullName', 'shortName', 'prefecture']
+      }],
+      order: [['start_date', 'ASC']] // 開始日時で昇順ソート
     });
-
-    const formattedSchedules = schedules.map(schedule => ({
-      title: `${schedule.Track.name} - ${schedule.title}`,
-      start: schedule.start_date, // 直接start_dateを参照
-      end: schedule.end_date,     // 直接end_dateを参照
-    }));
-
-    res.json(formattedSchedules);
+    res.json(schedules);
   } catch (error) {
     console.error('Error fetching schedules:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
