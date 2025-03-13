@@ -13,7 +13,22 @@ const Track = require('./track')(sequelize, DataTypes);
 const Schedule = require('./schedule')(sequelize, DataTypes);
 const RaceFormat = require('./raceFormat')(sequelize, DataTypes);
 
-Track.hasMany(Schedule);
-Schedule.belongsTo(Track);
+// リレーションシップの定義
+Track.hasMany(Schedule, {
+  foreignKey: 'TrackId',
+  onUpdate: 'CASCADE',
+  onDelete: 'SET NULL',
+});
+Schedule.belongsTo(Track, {
+  foreignKey: 'TrackId',
+  onUpdate: 'CASCADE',
+  onDelete: 'SET NULL',
+});
+Schedule.belongsTo(RaceFormat, {
+  foreignKey: 'raceFormat', // ScheduleモデルのraceFormatフィールドがRaceFormatモデルのIDを参照
+  targetKey: 'ID',
+  onUpdate: 'CASCADE',
+  onDelete: 'SET NULL',
+});
 
 module.exports = sequelize;

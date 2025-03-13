@@ -38,7 +38,7 @@ router.get('/', async (req, res) => {
     })));
   } catch (error) {
     console.error('Error fetching schedules:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: 'Internal server error', details: error.message });
   }
 });
 
