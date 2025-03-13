@@ -1,13 +1,13 @@
 const express = require('express');
 const router = express.Router();
-const sequelize = require('../models');
-const Track = sequelize.models.Track;
+const { Track, Prefecture } = require('../models');
 
 // GET /tracks - すべてのトラックを取得
 router.get('/', async (req, res) => {
   try {
     const tracks = await Track.findAll({
-      attributes: ['id', 'fullName', 'shortName', 'prefecture', 'homepageUrl']
+      attributes: ['id', 'fullName', 'shortName', 'prefecture', 'homepageUrl'],
+      order: [['id', 'ASC']]
     });
     res.json(tracks);
   } catch (error) {
@@ -16,20 +16,13 @@ router.get('/', async (req, res) => {
   }
 });
 
-// GET /tracks/:id - 指定したトラックIDのトラックを取得
+// GET /tracks/:id - 特定のトラックを取得
 router.get('/:id', async (req, res) => {
   try {
-    const { id } = req.params;
-
-    // トラックの取得
-    const track = await Track.findByPk(id, {
-      attributes: ['id', 'fullName', 'shortName', 'prefecture', 'homepageUrl']
-    });
-
+    const track = await Track.findByPk(req.params.id);
     if (!track) {
       return res.status(404).json({ error: 'トラックが見つかりません' });
     }
-
     res.json(track);
   } catch (error) {
     console.error('Error fetching track:', error);
@@ -41,35 +34,76 @@ router.get('/:id', async (req, res) => {
 router.post('/', async (req, res) => {
   try {
     const { fullName, shortName, prefecture, homepageUrl } = req.body;
-    
-    // バリデーション
+
+    // データの検証
     if (!fullName || !shortName || !prefecture) {
-      return res.status(400).json({ 
-        error: '必須項目が不足しています',
-        required: ['fullName', 'shortName', 'prefecture']
-      });
+      return res.status(400).json({ error: '必須項目が不足しています' });
     }
 
     const track = await Track.create({
       fullName,
       shortName,
       prefecture,
-      homepageUrl,
-      createdAt: new Date(),
-      updatedAt: new Date()
+      homepageUrl: homepageUrl || null
     });
 
-    res.status(201).json({
-      trackId: track.id,
-      fullName: track.fullName,
-      shortName: track.shortName,
-      prefecture: track.prefecture,
-      homepageUrl: track.homepageUrl
-    });
-
+    res.status(201).json(track);
   } catch (error) {
     console.error('Error creating track:', error);
     res.status(500).json({ error: 'トラックの作成に失敗しました' });
+  }
+});
+
+// PUT /tracks/:id - トラックを更新
+router.put('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { fullName, shortName, prefecture, homepageUrl } = req.body;
+
+    // トラックの取得
+    const track = await Track.findByPk(id);
+    if (!track) {
+      return res.status(404).json({ error: 'トラックが見つかりません' });
+    }
+
+    // データの検証
+    if (!fullName || !shortName || !prefecture) {
+      return res.status(400).json({ error: '必須項目が不足しています' });
+    }
+
+    // トラックの更新
+    track.fullName = fullName;
+    track.shortName = shortName;
+    track.prefecture = prefecture;
+    track.homepageUrl = homepageUrl || null;
+
+    await track.save();
+
+    res.json(track);
+  } catch (error) {
+    console.error('Error updating track:', error);
+    res.status(500).json({ error: 'トラックの更新に失敗しました' });
+  }
+});
+
+// DELETE /tracks/:id - トラックを削除
+router.delete('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // トラックの取得
+    const track = await Track.findByPk(id);
+    if (!track) {
+      return res.status(404).json({ error: 'トラックが見つかりません' });
+    }
+
+    // トラックの削除
+    await track.destroy();
+
+    res.status(204).send();
+  } catch (error) {
+    console.error('Error deleting track:', error);
+    res.status(500).json({ error: 'トラックの削除に失敗しました' });
   }
 });
 
