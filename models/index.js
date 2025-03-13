@@ -32,7 +32,18 @@ Schedule.belongsTo(RaceFormat, {
   onDelete: 'SET NULL',
 });
 
-const prefecturesRouter = require('../routes/prefectures');
-app.use('/prefectures', prefecturesRouter);
+const express = require('express');
+const router = express.Router();
 
-module.exports = sequelize;
+// GET /prefectures - すべての都道府県を取得
+router.get('/', async (req, res) => {
+  try {
+    const prefectures = await Prefecture.findAll();
+    res.json(prefectures);
+  } catch (error) {
+    console.error('Error fetching prefectures:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+module.exports = router;
