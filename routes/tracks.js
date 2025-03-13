@@ -7,7 +7,7 @@ const Track = sequelize.models.Track;
 router.get('/', async (req, res) => {
   try {
     const tracks = await Track.findAll({
-      attributes: ['id', 'fullName', 'shortName', 'prefecture']
+      attributes: ['id', 'fullName', 'shortName', 'prefecture', 'homepageUrl']
     });
     res.json(tracks);
   } catch (error) {
@@ -23,7 +23,7 @@ router.get('/:id', async (req, res) => {
 
     // トラックの取得
     const track = await Track.findByPk(id, {
-      attributes: ['id', 'fullName', 'shortName', 'prefecture']
+      attributes: ['id', 'fullName', 'shortName', 'prefecture', 'homepageUrl']
     });
 
     if (!track) {
