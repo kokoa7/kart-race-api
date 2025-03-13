@@ -62,6 +62,78 @@ router.get('/track/:trackId', async (req, res) => {
   }
 });
 
+// GET /schedules/race/:raceFormat - 特定のレースフォーマットのスケジュールを取得
+router.get('/race/:raceFormat', async (req, res) => {
+  try {
+    const { raceFormat } = req.params;
+    
+    // レースフォーマットの検証
+    if (!raceFormat) {
+      return res.status(400).json({ error: '有効なレースフォーマットを指定してください' });
+    }
+    
+    const schedules = await Schedule.findAll({
+      where: {
+        raceFormat: raceFormat
+      },
+      include: [
+        {
+          model: Track,
+          attributes: ['id', 'fullName', 'shortName']
+        },
+        {
+          model: RaceFormat,
+          attributes: ['ID', 'name']
+        }
+      ],
+      order: [['startDate', 'ASC']] // 開始日時でソート
+    });
+    
+    if (schedules.length === 0) {
+      return res.status(404).json({ message: '指定されたレースフォーマットのスケジュールが見つかりません' });
+    }
+    
+    res.json(schedules);
+  } catch (error) {
+    console.error('Error fetching schedules by race format:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// GET /schedules/:id - 特定のスケジュールを取得
+router.get('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    // IDの検証
+    if (!id || isNaN(parseInt(id, 10))) {
+      return res.status(400).json({ error: '有効なスケジュールIDを指定してください' });
+    }
+    
+    const schedule = await Schedule.findByPk(parseInt(id, 10), {
+      include: [
+        {
+          model: Track,
+          attributes: ['id', 'fullName', 'shortName']
+        },
+        {
+          model: RaceFormat,
+          attributes: ['ID', 'name']
+        }
+      ]
+    });
+    
+    if (!schedule) {
+      return res.status(404).json({ error: 'スケジュールが見つかりません' });
+    }
+    
+    res.json(schedule);
+  } catch (error) {
+    console.error('Error fetching schedule:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 // POST /schedules - 新しいスケジュールを作成
 router.post('/', async (req, res) => {
   try {
