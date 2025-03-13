@@ -12,6 +12,7 @@ const sequelize = new Sequelize(process.env.DATABASE_URL || 'postgres://localhos
 const Track = require('./track')(sequelize, DataTypes);
 const Schedule = require('./schedule')(sequelize, DataTypes);
 const RaceFormat = require('./raceFormat')(sequelize, DataTypes);
+const Prefecture = require('./prefecture')(sequelize, DataTypes);
 
 // リレーションシップの定義
 Track.hasMany(Schedule, {
