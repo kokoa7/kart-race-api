@@ -24,6 +24,44 @@ router.get('/', async (req, res) => {
   }
 });
 
+// GET /schedules/track/:trackId - 特定のトラックのスケジュールを取得
+router.get('/track/:trackId', async (req, res) => {
+  try {
+    const { trackId } = req.params;
+
+    // トラックIDの検証
+    if (!trackId || isNaN(parseInt(trackId, 10))) {
+      return res.status(400).json({ error: '有効なトラックIDを指定してください' });
+    }
+
+    const schedules = await Schedule.findAll({
+      where: {
+        TrackId: parseInt(trackId, 10)
+      },
+      include: [
+        {
+          model: Track,
+          attributes: ['id', 'fullName', 'shortName']
+        },
+        {
+          model: RaceFormat,
+          attributes: ['ID', 'name']
+        }
+      ],
+      order: [['startDate', 'ASC']] // 開始日時でソート
+    });
+
+    if (schedules.length === 0) {
+      return res.status(404).json({ message: '指定されたトラックのスケジュールが見つかりません' });
+    }
+
+    res.json(schedules);
+  } catch (error) {
+    console.error('Error fetching schedules by track:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 // POST /schedules - 新しいスケジュールを作成
 router.post('/', async (req, res) => {
   try {
