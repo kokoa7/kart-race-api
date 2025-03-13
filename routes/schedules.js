@@ -3,19 +3,39 @@ const router = express.Router();
 const sequelize = require('../models');
 const Track = sequelize.models.Track;
 const Schedule = sequelize.models.Schedule;
+const RaceFormat = sequelize.models.RaceFormat;
 
 // GET /schedules - すべてのスケジュールを取得
 router.get('/', async (req, res) => {
   try {
     const schedules = await Schedule.findAll({
-      attributes: ['id', 'title', 'start_date', 'end_date'],
+      attributes: ['id', 'title', 'startDate', 'endDate', 'raceFormat', 'raceUrl'],
       include: [{
         model: Track,
         attributes: ['id', 'fullName', 'shortName', 'prefecture']
+      }, {
+        model: RaceFormat,
+        attributes: ['ID', 'name']
       }],
-      order: [['start_date', 'ASC']] // 開始日時で昇順ソート
+      order: [['startDate', 'ASC']] // 開始日時で昇順ソート
     });
-    res.json(schedules);
+    res.json(schedules.map(schedule => ({
+      id: schedule.id,
+      title: schedule.title,
+      startDate: schedule.startDate,
+      endDate: schedule.endDate,
+      raceFormat: {
+        id: schedule.RaceFormat.ID,
+        name: schedule.RaceFormat.name
+      },
+      raceUrl: schedule.raceUrl,
+      Track: {
+        id: schedule.Track.id,
+        fullName: schedule.Track.fullName,
+        shortName: schedule.Track.shortName,
+        prefecture: schedule.Track.prefecture
+      }
+    })));
   } catch (error) {
     console.error('Error fetching schedules:', error);
     res.status(500).json({ error: 'Internal server error' });
@@ -25,7 +45,7 @@ router.get('/', async (req, res) => {
 // POST /schedules - 新しいスケジュールを作成
 router.post('/', async (req, res) => {
   try {
-    const { date, trackId, raceName } = req.body;
+    const { date, trackId, raceName, raceFormat, raceUrl } = req.body;
 
     // 日付の処理
     const startDate = new Date(`${date}T10:00:00`); // 10:00開始
@@ -38,9 +58,11 @@ router.post('/', async (req, res) => {
 
     const schedule = await Schedule.create({
       title: raceName,
-      start_date: startDate,
-      end_date: endDate,
-      TrackId: parseInt(trackId, 10)
+      startDate,
+      endDate,
+      TrackId: parseInt(trackId, 10),
+      raceFormat: raceFormat || '0',
+      raceUrl: raceUrl || null
     });
 
     res.status(201).json(schedule);

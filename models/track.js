@@ -12,10 +12,23 @@ module.exports = (sequelize, DataTypes) => {
     shortName: {
       type: DataTypes.STRING,
       allowNull: false,
+      defaultValue: '',
     },
     prefecture: {
       type: DataTypes.STRING,
       allowNull: false,
+    },
+    createdAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+    },
+    homepageUrl: {
+      type: DataTypes.STRING,
+      allowNull: true,
     }
   }, {
     tableName: 'Tracks', // テーブル名を明示

@@ -9,11 +9,11 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING(255),
       allowNull: false,
     },
-    start_date: {
+    startDate: {
       type: DataTypes.DATE, // timestamp with time zone に対応
       allowNull: false,
     },
-    end_date: {
+    endDate: {
       type: DataTypes.DATE, // timestamp with time zone に対応
       allowNull: false,
     },
@@ -25,10 +25,14 @@ module.exports = (sequelize, DataTypes) => {
         key: 'id',      // 参照するカラム
       },
     },
-    is_splint: {
-      type: DataTypes.BOOLEAN,
+    raceFormat: {
+      type: DataTypes.INTEGER, // raceFormatを整数型に変更
       allowNull: false,
-      defaultValue: true,
+      defaultValue: 0, // デフォルト値を整数に変更
+    },
+    raceUrl: {
+      type: DataTypes.STRING, // 文字列型
+      allowNull: true, // NULLを許可
     },
   }, {
     tableName: 'Schedules', // テーブル名を明示
@@ -39,6 +43,12 @@ module.exports = (sequelize, DataTypes) => {
   Schedule.associate = (models) => {
     Schedule.belongsTo(models.Track, {
       foreignKey: 'TrackId',
+      onUpdate: 'CASCADE',
+      onDelete: 'SET NULL',
+    });
+    Schedule.belongsTo(models.RaceFormat, {
+      foreignKey: 'raceFormat', // 外部キーとして使用
+      targetKey: 'ID',
       onUpdate: 'CASCADE',
       onDelete: 'SET NULL',
     });

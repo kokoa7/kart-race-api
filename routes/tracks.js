@@ -19,7 +19,7 @@ router.get('/', async (req, res) => {
 // POST /tracks - 新しいトラックを作成
 router.post('/', async (req, res) => {
   try {
-    const { fullName, shortName, prefecture } = req.body;
+    const { fullName, shortName, prefecture, homepageUrl } = req.body;
     
     // バリデーション
     if (!fullName || !shortName || !prefecture) {
@@ -32,14 +32,18 @@ router.post('/', async (req, res) => {
     const track = await Track.create({
       fullName,
       shortName,
-      prefecture
+      prefecture,
+      homepageUrl,
+      createdAt: new Date(),
+      updatedAt: new Date()
     });
 
     res.status(201).json({
       trackId: track.id,
       fullName: track.fullName,
       shortName: track.shortName,
-      prefecture: track.prefecture
+      prefecture: track.prefecture,
+      homepageUrl: track.homepageUrl
     });
 
   } catch (error) {
