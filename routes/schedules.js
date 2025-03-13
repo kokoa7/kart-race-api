@@ -12,10 +12,10 @@ router.get('/', async (req, res) => {
       attributes: ['id', 'title', 'startDate', 'endDate', 'raceFormat', 'raceUrl'],
       include: [{
         model: Track,
-        attributes: ['id', 'fullName', 'shortName', 'prefecture']
+        attributes: ['id'] // Trackのidのみ取得
       }, {
         model: RaceFormat,
-        attributes: ['ID', 'name']
+        attributes: ['ID'] // RaceFormatのIDのみ取得
       }],
       order: [['startDate', 'ASC']] // 開始日時で昇順ソート
     });
@@ -25,15 +25,11 @@ router.get('/', async (req, res) => {
       startDate: schedule.startDate,
       endDate: schedule.endDate,
       raceFormat: {
-        id: schedule.RaceFormat.ID,
-        name: schedule.RaceFormat.name
+        id: schedule.RaceFormat.ID // RaceFormatのIDを取得
       },
       raceUrl: schedule.raceUrl,
       Track: {
-        id: schedule.Track.id,
-        fullName: schedule.Track.fullName,
-        shortName: schedule.Track.shortName,
-        prefecture: schedule.Track.prefecture
+        id: schedule.Track.id // Trackのidを取得
       }
     })));
   } catch (error) {
