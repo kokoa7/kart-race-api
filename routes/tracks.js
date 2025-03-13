@@ -16,6 +16,27 @@ router.get('/', async (req, res) => {
   }
 });
 
+// GET /tracks/:id - 指定したトラックIDのトラックを取得
+router.get('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // トラックの取得
+    const track = await Track.findByPk(id, {
+      attributes: ['id', 'fullName', 'shortName', 'prefecture']
+    });
+
+    if (!track) {
+      return res.status(404).json({ error: 'トラックが見つかりません' });
+    }
+
+    res.json(track);
+  } catch (error) {
+    console.error('Error fetching track:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 // POST /tracks - 新しいトラックを作成
 router.post('/', async (req, res) => {
   try {
