@@ -1,44 +1,26 @@
 const express = require('express');
 const router = express.Router();
-const sequelize = require('../models');
-const Track = sequelize.models.Track;
-const Schedule = sequelize.models.Schedule;
-const RaceFormat = sequelize.models.RaceFormat;
+const { Schedule, Track, RaceFormat } = require('../models');
 
 // GET /schedules - すべてのスケジュールを取得
 router.get('/', async (req, res) => {
   try {
     const schedules = await Schedule.findAll({
-      attributes: ['id', 'title', 'startDate', 'endDate', 'raceFormat', 'raceUrl'],
-      include: [{
-        model: Track,
-        attributes: ['id', 'fullName', 'shortName', 'prefecture'] // Trackの詳細情報を取得
-      }, {
-        model: RaceFormat,
-        attributes: ['ID', 'name'] // RaceFormatの詳細情報を取得
-      }],
-      order: [['startDate', 'ASC']] // 開始日時で昇順ソート
+      include: [
+        {
+          model: Track,
+          attributes: ['id', 'fullName', 'shortName']
+        },
+        {
+          model: RaceFormat,
+          attributes: ['ID', 'name']
+        }
+      ]
     });
-    res.json(schedules.map(schedule => ({
-      id: schedule.id,
-      title: schedule.title,
-      startDate: schedule.startDate,
-      endDate: schedule.endDate,
-      raceFormat: {
-        id: schedule.RaceFormat.ID, // RaceFormatのIDを取得
-        name: schedule.RaceFormat.name // RaceFormatのnameを取得
-      },
-      raceUrl: schedule.raceUrl,
-      Track: {
-        id: schedule.Track.id, // Trackのidを取得
-        fullName: schedule.Track.fullName, // Trackのフルネームを取得
-        shortName: schedule.Track.shortName, // Trackの短縮名を取得
-        prefecture: schedule.Track.prefecture // Trackの都道府県を取得
-      }
-    })));
+    res.json(schedules);
   } catch (error) {
     console.error('Error fetching schedules:', error);
-    res.status(500).json({ error: 'Internal server error', details: error.message });
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
