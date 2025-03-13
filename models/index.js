@@ -32,11 +32,13 @@ Schedule.belongsTo(RaceFormat, {
   onDelete: 'SET NULL',
 });
 
-// モデルをエクスポート
-module.exports = {
+const db = {
   sequelize,
+  Sequelize,
   Track,
   Schedule,
   RaceFormat,
   Prefecture
 };
+
+module.exports = db;
