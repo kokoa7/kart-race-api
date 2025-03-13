@@ -32,4 +32,7 @@ Schedule.belongsTo(RaceFormat, {
   onDelete: 'SET NULL',
 });
 
+const prefecturesRouter = require('./routes/prefectures');
+app.use('/prefectures', prefecturesRouter);
+
 module.exports = sequelize;
