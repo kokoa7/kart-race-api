@@ -51,8 +51,9 @@ router.get('/track/:trackId', async (req, res) => {
       order: [['startDate', 'ASC']] // 開始日時でソート
     });
 
+    // 検索結果が0件の場合でも200を返す
     if (schedules.length === 0) {
-      return res.status(404).json({ message: '指定されたトラックのスケジュールが見つかりません' });
+      return res.status(200).json({ schedules: [], message: '指定されたトラックのスケジュールが見つかりません' });
     }
 
     res.json(schedules);
@@ -89,8 +90,9 @@ router.get('/race/:raceFormat', async (req, res) => {
       order: [['startDate', 'ASC']] // 開始日時でソート
     });
     
+    // 検索結果が0件の場合でも200を返す
     if (schedules.length === 0) {
-      return res.status(404).json({ message: '指定されたレースフォーマットのスケジュールが見つかりません' });
+      return res.status(200).json({ schedules: [], message: '指定されたレースフォーマットのスケジュールが見つかりません' });
     }
     
     res.json(schedules);
@@ -123,8 +125,9 @@ router.get('/:id', async (req, res) => {
       ]
     });
     
+    // 検索結果が0件の場合でも200を返す
     if (!schedule) {
-      return res.status(404).json({ error: 'スケジュールが見つかりません' });
+      return res.status(200).json({ schedule: null, message: 'スケジュールが見つかりません' });
     }
     
     res.json(schedule);
